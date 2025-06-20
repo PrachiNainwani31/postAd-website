@@ -1,0 +1,171 @@
+/* === GENERAL LAYOUT === */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+  position: relative;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-img {
+  height: 40px;
+}
+
+.site-name {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  width: 250px;
+  transition: width 0.3s ease;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  padding: 8px 12px;
+  border: none;
+  background-color: #eee;
+  cursor: pointer;
+}
+
+.post-btn {
+  background-color: black;
+  color: white;
+}
+
+/* === HAMBURGER MENU === */
+.hamburger {
+  font-size: 24px;
+  cursor: pointer;
+  display: block;
+  margin-left: 10px;
+}
+
+/* === SIDEBAR (Mobile only) === */
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 260px;
+  background-color: #aaa8a8;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar .btn {
+  margin-bottom: 10px;
+}
+
+.sidebar-avatar {
+  font-size: 22px;
+  background-color: #333;
+  color: white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+/* Ensures Logout button stays at the bottom */
+.sidebar {
+  display: flex;
+}
+
+.sidebar .logout-btn {
+  margin-top: auto;
+  background-color: crimson;
+  color: white;
+}
+
+/* === DROPDOWN MENU (Desktop only) === */
+.dropdown-menu {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+}
+
+/* === OVERLAY === */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+}
+
+/* === MOBILE RESPONSIVENESS === */
+@media (max-width: 768px) {
+  .search-input {
+    width: 150px;
+  }
+
+  .nav-buttons {
+    display: none; /* hide normal nav buttons in mobile */
+  }
+
+  .hamburger {
+    display: block;
+  }
+
+  .dropdown-menu {
+    display: none; /* hide desktop dropdown in mobile */
+  }
+}
+
+/* === DESKTOP ONLY UTILITY === */
+.desktop-only {
+  display: none;
+}
+
+@media screen and (min-width: 768px) {
+  .desktop-only {
+    display: block;
+  }
+
+  .sidebar {
+    display: none; /* prevent sidebar on desktop */
+  }
+}
+
