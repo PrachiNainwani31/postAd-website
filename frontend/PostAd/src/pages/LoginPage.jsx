@@ -3,7 +3,7 @@ import '../styles/LoginPage.css';
 import API from '../api/api';
 
 function LoginModal({ close, switchToRegister,setUser }) {
-  const [form, setForm] = useState({ contact: '', password: '' });
+  const [form, setForm] = useState({ email: '', password: '' });
     const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -14,23 +14,25 @@ function LoginModal({ close, switchToRegister,setUser }) {
   };
 
    const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await API.post('/auth/login', form);
-      setSuccess('Login successful');
-      setUser(res.data.user); // update parent state
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      close(); // close modal
-    } catch (err) {
-      if (err.response?.data?.message.includes('not found')) {
-        setError('Incorrect email or phone');
-      } else if (err.response?.data?.message.includes('Incorrect password')) {
-        setError('Incorrect password');
-      } else {
-        setError('Login failed');
-      }
+  e.preventDefault();
+  try {
+    const res = await API.post('/auth/login', form);
+    setSuccess('Login successful');
+    setUser(res.data.user);
+    localStorage.setItem("user", JSON.stringify(res.data.user));
+    localStorage.setItem("token", res.data.token); // Save token
+    close();
+  } catch (err) {
+    if (err.response?.data?.message.includes('not found')) {
+      setError('Incorrect email');
+    } else if (err.response?.data?.message.includes('Incorrect password')) {
+      setError('Incorrect password');
+    } else {
+      setError('Login failed');
     }
-  };
+  }
+};
+
 
   return (
     <div className="modal-overlay" onClick={close}>
@@ -38,8 +40,8 @@ function LoginModal({ close, switchToRegister,setUser }) {
         <button className="close-btn" onClick={close}>×</button>
         <form className="login-form" onSubmit={handleLogin}>
           <input
-            name="contact"
-            placeholder="Email or Phone"
+            name="email"
+            placeholder="Email"
             onChange={handleChange}
             required
           />

@@ -13,9 +13,21 @@ const Navbar = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      fetch("http://localhost:5000/api/auth/validate", {
+        headers: { Authorization: `Bearer ${storedToken}` },
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.valid) {
+            setUser(data.user);
+            localStorage.setItem("user", JSON.stringify(data.user));
+          } else {
+            handleLogout();
+          }
+        })
+        .catch(() => handleLogout());
     }
   }, []);
 
@@ -67,18 +79,17 @@ const Navbar = () => {
           <input type="text" className="search-input" placeholder="Search..." />
           {!isMobile && (
             <div className="nav-buttons">
+              <button className="btn post-btn">Post Ad</button>
               {user ? (
                 <>
                   <div className="user-avatar" onClick={toggleSidebar}>
                     {user.name?.charAt(0)}
                   </div>
-                  <button className="btn">My Ads</button>
-                  <div className="hamburger" onClick={toggleSidebar}>☰</div>
                 </>
               ) : (
                 <button className="btn" onClick={openLogin}>Login/Register</button>
               )}
-              <button className="btn post-btn">Post Ad</button>
+              <div className="hamburger" onClick={toggleSidebar}>☰</div>
             </div>
           )}
           {isMobile && (
@@ -129,6 +140,10 @@ const Navbar = () => {
         <RegisterModal
           close={() => setShowRegisterModal(false)}
           switchToLogin={openLogin}
+          setUser={(user) => {
+            setUser(user);
+            setShowRegisterModal(false);
+          }}
         />
       )}
     </>

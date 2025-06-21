@@ -1,34 +1,50 @@
 import React, { useState } from 'react';
-import API from '../api/api';
 import '../styles/RegisterModal.css';
+import API from '../api/api';
 
-function RegisterModal({ close, switchToLogin }) {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", password: "" });
+function RegisterModal({ close, switchToLogin, setUser }) {
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setError('');
+    setSuccess('');
+  };
 
   const handleRegister = async () => {
     try {
       const res = await API.post("/auth/register", form);
-      alert(res.data.message); // "OTP sent"
+      setSuccess("OTP sent to your email");
       setOtpSent(true);
     } catch (err) {
-      alert(err.response?.data?.message || "Registration failed");
+      setError(err.response?.data?.message || "Registration failed");
     }
   };
 
   const handleOtpVerify = async () => {
     try {
       const res = await API.post("/auth/verify-otp", {
-        contact: form.email || form.phone,
+        contact: form.email,
         otp
       });
-      alert(res.data.message); // "OTP verified"
-      close(); // Close modal
+
+      const loginRes = await API.post("/auth/login", {
+        email: form.email,
+        password: form.password
+      });
+
+      const { token, user } = loginRes.data;
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      setUser(user);
+      setSuccess("Registration successful");
+      close();
     } catch (err) {
-      alert(err.response?.data?.message || "OTP verification failed");
+      setError(err.response?.data?.message || "OTP verification failed");
     }
   };
 
@@ -39,15 +55,14 @@ function RegisterModal({ close, switchToLogin }) {
 
         {!otpSent ? (
           <form className="register-form" onSubmit={(e) => { e.preventDefault(); handleRegister(); }}>
-            <input name="name" placeholder="Name" onChange={handleChange} required />
-            <input name="email" placeholder="Email" onChange={handleChange} />
-            <input name="phone" placeholder="Phone" onChange={handleChange} />
-            <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
+            <input name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
+            <input name="email" placeholder="Email" value={form.email} onChange={handleChange} required />
+            <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} required />
             <button type="submit">Register</button>
-
+            {error && <p className="error-text">{error}</p>}
+            {success && <p className="success-text">{success}</p>}
             <p className="login-text">
-              Already have an account?{" "}
-              <span className="login-link" onClick={switchToLogin}>Login</span>
+              Already have an account? <span className="login-link" onClick={switchToLogin}>Login</span>
             </p>
           </form>
         ) : (
@@ -59,6 +74,8 @@ function RegisterModal({ close, switchToLogin }) {
               required
             />
             <button type="submit">Verify OTP</button>
+            {error && <p className="error-text">{error}</p>}
+            {success && <p className="success-text">{success}</p>}
           </form>
         )}
       </div>

@@ -54,7 +54,6 @@
   display: none;
 }
 
-/* Responsive category buttons toggle */
 @media screen and (max-width: 768px) {
   .desktop-only {
     display: none;
@@ -74,7 +73,6 @@
   padding: 0 20px;
 }
 
-/* Make pagination and page info mobile-friendly */
 .pagination {
   display: flex;
   justify-content: center;

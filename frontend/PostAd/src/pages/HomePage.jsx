@@ -15,8 +15,8 @@ const dummyAds=[
   { id: 8, title: "Fan", price: "1,000", location: "Bhopal", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" },
   { id: 9, title: "Refrigerator", price: "22,000", location: "Kanpur", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" },
   { id: 10, title: "Washing Machine", price: "11,000", location: "Agra", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" },
-  { id: 10, title: "Washing Machine", price: "11,000", location: "Agra", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" },
-  { id: 10, title: "Washing Machine", price: "11,000", location: "Agra", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" }
+  { id: 11, title: "Washing Machine", price: "11,000", location: "Agra", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" },
+  { id: 12, title: "Washing Machine", price: "11,000", location: "Agra", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" }
 ]
 const HomePage = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
