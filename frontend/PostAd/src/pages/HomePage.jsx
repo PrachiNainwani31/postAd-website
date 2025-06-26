@@ -1,69 +1,87 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import AdCard from '../components/AdCard';
 import Footer from '../components/Footer';
 import '../styles/HomePage.css';
+import LoginModal from '../pages/LoginPage';
+import RegisterModal from '../components/RegisterModal';
+
 const adsPerPage = 12;
-const dummyAds=[
-  { id: 1, title: "Dell Laptop", price: "48,000", location: "Delhi", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" },
-  { id: 2, title: "Job Vacancy", price: "500/hr", location: "Mumbai", image: "https://th.bing.com/th/id/OIP.0Vid-4GQvVJqTfmPC1I9SQHaHa?w=208&h=208&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" },
-  { id: 3, title: "Washing Machine", price: "10,000", location: "Kota", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" },
-  { id: 4, title: "Sofa Set", price: "15,000", location: "Jaipur", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" },
-  { id: 5, title: "AC", price: "20,000", location: "Noida", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" },
-  { id: 6, title: "TV", price: "12,000", location: "Delhi", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" },
-  { id: 7, title: "Table", price: "3,000", location: "Indore", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" },
-  { id: 8, title: "Fan", price: "1,000", location: "Bhopal", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" },
-  { id: 9, title: "Refrigerator", price: "22,000", location: "Kanpur", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" },
-  { id: 10, title: "Washing Machine", price: "11,000", location: "Agra", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" },
-  { id: 11, title: "Washing Machine", price: "11,000", location: "Agra", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" },
-  { id: 12, title: "Washing Machine", price: "11,000", location: "Agra", image: "https://apollo.olx.in/v1/files/icnej111jgju1-IN/image;s=780x0;q=60" }
-]
+
+
 const HomePage = () => {
+  const [ads, setAds] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(dummyAds.length / adsPerPage);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user')));
+  const navigate = useNavigate();
 
+  const totalPages = Math.ceil(ads.length / adsPerPage);
   const indexOfLastAd = currentPage * adsPerPage;
   const indexOfFirstAd = indexOfLastAd - adsPerPage;
-  const currentAds = dummyAds.slice(indexOfFirstAd, indexOfLastAd);
+  const currentAds = ads.slice(indexOfFirstAd, indexOfLastAd);
 
   const handlePageChange = (pageNum) => {
     if (pageNum >= 1 && pageNum <= totalPages) {
       setCurrentPage(pageNum);
     }
   };
+
+  const handlePostAdClick = () => {
+    if (!user) {
+      setShowLogin(true);
+    } else {
+      navigate('/post-ad');
+    }
+  };
+
+  useEffect(() => {
+  fetch('http://localhost:5000/api/ads')
+    .then(res => res.json())
+    .then(data => setAds(data))
+    .catch(err => console.log(err));
+}, []);
+
+
   return (
     <>
-    <Navbar/>
-    <div className="home-container">
+      <Navbar
+        onPostAdClick={handlePostAdClick}
+        user={user}
+        setUser={setUser}
+        openLogin={() => setShowLogin(true)}
+      />
 
+      <div className="home-container">
         <div className="category-bar">
-  <p className="category-title" onClick={() => setDropdownOpen(!dropdownOpen)}>
-    <strong>CATEGORIES</strong>
-  </p>
-  <div className="category-buttons desktop-only">
-    <button>Services</button>
-    <button>Business Promotion</button>
-    <button>Sales</button>
-    <button>Jobs</button>
-  </div>
-
-  {dropdownOpen && (
-    <div className="category-dropdown mobile-only">
-      <button>Services</button>
-      <button>Business Promotion</button>
-      <button>Sales</button>
-      <button>Jobs</button>
-    </div>
-  )}
-</div>
-
-        <div className="ads-grid">
-          {currentAds.map((ad) => (
-            <AdCard key={ad.id} ad={ad} />
-          ))}
+          <p className="category-title" onClick={() => setDropdownOpen(!dropdownOpen)}>
+            <strong>CATEGORIES</strong>
+          </p>
+          <div className="category-buttons desktop-only">
+            <button>Services</button>
+            <button>Business Promotion</button>
+            <button>Sales</button>
+            <button>Jobs</button>
+          </div>
+          {dropdownOpen && (
+            <div className="category-dropdown mobile-only">
+              <button>Services</button>
+              <button>Business Promotion</button>
+              <button>Sales</button>
+              <button>Jobs</button>
+            </div>
+          )}
         </div>
 
+        <div className="ads-grid">
+          {currentAds.map((ad, index) => (
+  <AdCard key={ad._id || ad.id || index} ad={ad} />
+))}
+
+        </div>
 
         <div className="pagination">
           <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
@@ -85,9 +103,32 @@ const HomePage = () => {
 
         <p className="current-page-label">Current page: {currentPage}</p>
       </div>
-      <Footer />
-    </>
-  )
-}
 
-export default HomePage
+      <Footer />
+
+      {showLogin && (
+        <LoginModal
+          close={() => setShowLogin(false)}
+          switchToRegister={() => {
+            setShowLogin(false);
+            setShowRegister(true);
+          }}
+          setUser={setUser}
+        />
+      )}
+
+      {showRegister && (
+        <RegisterModal
+          close={() => setShowRegister(false)}
+          switchToLogin={() => {
+            setShowRegister(false);
+            setShowLogin(true);
+          }}
+          setUser={setUser}
+        />
+      )}
+    </>
+  );
+};
+
+export default HomePage;

@@ -15,7 +15,8 @@ function RegisterModal({ close, switchToLogin, setUser }) {
     setSuccess('');
   };
 
-  const handleRegister = async () => {
+  const handleRegister = async (e) => {
+    e.preventDefault();
     try {
       const res = await API.post("/auth/register", form);
       setSuccess("OTP sent to your email");
@@ -25,7 +26,8 @@ function RegisterModal({ close, switchToLogin, setUser }) {
     }
   };
 
-  const handleOtpVerify = async () => {
+  const handleOtpVerify = async (e) => {
+    e.preventDefault();
     try {
       const res = await API.post("/auth/verify-otp", {
         contact: form.email,
@@ -54,7 +56,7 @@ function RegisterModal({ close, switchToLogin, setUser }) {
         <button className="close-btn" onClick={close}>×</button>
 
         {!otpSent ? (
-          <form className="register-form" onSubmit={(e) => { e.preventDefault(); handleRegister(); }}>
+          <form className="register-form" onSubmit= {handleRegister}>
             <input name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
             <input name="email" placeholder="Email" value={form.email} onChange={handleChange} required />
             <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} required />
@@ -66,7 +68,7 @@ function RegisterModal({ close, switchToLogin, setUser }) {
             </p>
           </form>
         ) : (
-          <form className="register-form" onSubmit={(e) => { e.preventDefault(); handleOtpVerify(); }}>
+          <form className="register-form" onSubmit={ handleOtpVerify}>
             <input
               placeholder="Enter OTP"
               value={otp}
