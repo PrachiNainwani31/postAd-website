@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect,useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import AdCard from '../components/AdCard';
@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import '../styles/HomePage.css';
 import LoginModal from '../pages/LoginPage';
 import RegisterModal from '../components/RegisterModal';
+import { AuthContext } from '../context/AuthContext';
 
 const adsPerPage = 12;
 
@@ -16,7 +17,8 @@ const HomePage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
-  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user')));
+
+const { user, login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const totalPages = Math.ceil(ads.length / adsPerPage);
@@ -39,7 +41,7 @@ const HomePage = () => {
   };
 
   useEffect(() => {
-  fetch('http://localhost:5000/api/ads')
+  fetch('http://localhost:5001/api/ads')
     .then(res => res.json())
     .then(data => setAds(data))
     .catch(err => console.log(err));
@@ -48,12 +50,10 @@ const HomePage = () => {
 
   return (
     <>
-      <Navbar
-        onPostAdClick={handlePostAdClick}
-        user={user}
-        setUser={setUser}
-        openLogin={() => setShowLogin(true)}
-      />
+      {/* <Navbar */}
+  {/* onPostAdClick={handlePostAdClick} */}
+  {/* openLogin={() => setShowLogin(true)} */}
+{/* /> */}
 
       <div className="home-container">
         <div className="category-bar">
@@ -113,7 +113,7 @@ const HomePage = () => {
             setShowLogin(false);
             setShowRegister(true);
           }}
-          setUser={setUser}
+          // setUser={setUser}
         />
       )}
 
@@ -124,7 +124,7 @@ const HomePage = () => {
             setShowRegister(false);
             setShowLogin(true);
           }}
-          setUser={setUser}
+          // setUser={setUser}
         />
       )}
     </>

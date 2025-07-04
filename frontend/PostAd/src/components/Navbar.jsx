@@ -1,35 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import '../styles/Navbar.css';
 import logo from '../assets/logo.jpg';
+import { AuthContext } from '../context/AuthContext';
 
-const Navbar = ({ onPostAdClick, user, setUser, openLogin }) => {
+const Navbar = ({ onPostAdClick, openLogin }) => {
+  const { user, login, logout, setUser } = useContext(AuthContext);
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
     const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      fetch("http://localhost:5000/api/auth/validate", {
+    if (storedToken && !user) {
+      fetch("http://localhost:5001/api/auth/validate", {
         headers: { Authorization: `Bearer ${storedToken}` },
       })
         .then(res => res.json())
         .then(data => {
           if (data.valid) {
             setUser(data.user);
-            localStorage.setItem("user", JSON.stringify(data.user));
           } else {
-            handleLogout();
+            logout();
           }
         })
-        .catch(() => handleLogout());
+        .catch(() => logout());
     }
-  }, []);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const toggleSidebar = () => {
@@ -41,9 +43,7 @@ const Navbar = ({ onPostAdClick, user, setUser, openLogin }) => {
   const closeDropdown = () => setShowDropdown(false);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
+    logout();
     closeSidebar();
     closeDropdown();
   };
@@ -96,7 +96,7 @@ const Navbar = ({ onPostAdClick, user, setUser, openLogin }) => {
             ) : (
               <button className="btn" onClick={openLogin}>Login/Register</button>
             )}
-            <button className="btn post-btn" onClick={onPostAdClick}>Post Ad</button>
+            <button className="btn post-btn" onClick={onPostAdClick} disabled={!user}>Post Ad</button>
             <div className="spacer" style={{ flexGrow: 1 }}></div>
             {user && <button className="btn logout-btn" onClick={handleLogout}>Logout</button>}
           </div>

@@ -5,10 +5,10 @@ const adSchema = new mongoose.Schema({
   description: String,
   price: String,
   location: String,
-  category: String, // <-- Added
+  category: String,
   images: [String],
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
-});
+},{ timestamps: true });
 
 
 export default mongoose.model('Ad', adSchema);

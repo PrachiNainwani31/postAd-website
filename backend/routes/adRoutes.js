@@ -32,6 +32,15 @@ images.push(`uploads/${filename}`);
   }
 });
 
+router.get('/:id', async (req, res) => {
+  try {
+    const ad = await Ad.findById(req.params.id).populate('user', 'name email');
+    res.json(ad);
+  } catch (err) {
+    res.status(404).json({ error: 'Ad not found' });
+  }
+});
+
 router.get('/', async (req, res) => {
   const ads = await Ad.find().populate('user', 'name');
   res.json(ads);

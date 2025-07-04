@@ -63,12 +63,24 @@ exports.register = async (req, res) => {
 // Verify OTP and create user
 exports.verifyOtp = async (req, res) => {
   const { contact, otp } = req.body;
+  console.log("VERIFY OTP request body:", req.body);
+
   try {
     const record = await OTP.findOne({ contact }).sort({ createdAt: -1 });
-    if (!record || record.otp !== otp) return res.status(400).json({ message: 'Invalid OTP' });
-    if (record.expiresAt < new Date()) return res.status(400).json({ message: 'OTP expired' });
+    if (!record) {
+      return res.status(400).json({ message: 'No OTP found' });
+    }
 
-    // Check if user was already created
+    console.log("Stored OTP:", record.otp, "Provided:", otp);
+
+    if (record.otp !== otp) {
+      return res.status(400).json({ message: 'Invalid OTP' });
+    }
+
+    if (record.expiresAt < new Date()) {
+      return res.status(400).json({ message: 'OTP expired' });
+    }
+
     const already = await User.findOne({ email: contact });
     if (already) {
       await OTP.deleteMany({ contact });
@@ -80,12 +92,13 @@ exports.verifyOtp = async (req, res) => {
     await OTP.deleteMany({ contact });
 
     const token = generateToken(user._id);
-    res.json({ message: 'OTP verified', token, user: { name: user.name, email: user.email } });
+    return res.json({ message: 'OTP verified', token, user });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("OTP verification error:", err);
+    return res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 // Login
 exports.login = async (req, res) => {

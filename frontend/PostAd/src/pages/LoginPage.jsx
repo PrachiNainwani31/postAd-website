@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import '../styles/LoginPage.css';
 import API from '../api/api';
+import { AuthContext } from '../context/AuthContext';
 
-function LoginModal({ close, switchToRegister,setUser }) {
+function LoginModal({ close, switchToRegister }) {
   const [form, setForm] = useState({ email: '', password: '' });
-    const [error, setError] = useState('');
+  const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const { login } = useContext(AuthContext);  // ✅ use context
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -13,16 +16,18 @@ function LoginModal({ close, switchToRegister,setUser }) {
     setSuccess('');
   };
 
-   const handleLogin = async (e) => {
+  const handleLogin = async (e) => {
   e.preventDefault();
   try {
     const res = await API.post('/auth/login', form);
-    setSuccess('Login successful');
-    setUser(res.data.user);
-    localStorage.setItem("user", JSON.stringify(res.data.user));
-    localStorage.setItem("token", res.data.token); // Save token
+    setError('');                         
+    setSuccess('Login successful');      
+
+    login(res.data.user);
+    localStorage.setItem("token", res.data.token);
     close();
   } catch (err) {
+    setSuccess('');                      
     if (err.response?.data?.message.includes('not found')) {
       setError('Incorrect email');
     } else if (err.response?.data?.message.includes('Incorrect password')) {
@@ -49,7 +54,7 @@ function LoginModal({ close, switchToRegister,setUser }) {
             name="password"
             type="password"
             placeholder="Password"
-           onChange={handleChange}
+            onChange={handleChange}
             required
           />
           <button type="submit">Login</button>

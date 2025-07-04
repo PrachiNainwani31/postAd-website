@@ -4,7 +4,7 @@
   max-width: 600px;
   margin: 80px auto;
   padding: 30px;
-  background: #fff;
+  background: #faf9fa58;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
@@ -13,7 +13,7 @@
   text-align: center;
   font-size: 1.8rem;
   font-weight: 600;
-  background-color: #f2f2f2;
+  background-color: #d0cfcf;
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 25px;
@@ -52,7 +52,7 @@ input[type="file"] {
 button[type="submit"] {
   padding: 12px;
   font-size: 1rem;
-  background-color: #4caf50;
+  background-color: #858a85;
   color: white;
   border: none;
   border-radius: 8px;
@@ -61,12 +61,12 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-  background-color: #45a049;
+  background-color: #737673;
 }
 
 .message {
   text-align: center;
   margin-top: 20px;
   font-weight: 500;
-  color: #4caf50;
+  color: #58c05b;
 }

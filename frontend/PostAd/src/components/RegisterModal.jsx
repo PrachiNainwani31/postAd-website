@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import '../styles/RegisterModal.css';
 import API from '../api/api';
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
-function RegisterModal({ close, switchToLogin, setUser }) {
+function RegisterModal({ close, switchToLogin}) {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const { login } = useContext(AuthContext);
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -16,15 +20,17 @@ function RegisterModal({ close, switchToLogin, setUser }) {
   };
 
   const handleRegister = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await API.post("/auth/register", form);
-      setSuccess("OTP sent to your email");
-      setOtpSent(true);
-    } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
-    }
-  };
+  e.preventDefault();
+  console.log("Register form data:", form); // 👈 log it
+  try {
+    const res = await API.post("/auth/register", form);
+    setSuccess("OTP sent to your email");
+    setOtpSent(true);
+  } catch (err) {
+    console.error("Register Error:", err.response?.data); // log backend error
+    setError(err.response?.data?.message || "Registration failed");
+  }
+};
 
   const handleOtpVerify = async (e) => {
     e.preventDefault();
@@ -42,7 +48,7 @@ function RegisterModal({ close, switchToLogin, setUser }) {
       const { token, user } = loginRes.data;
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-      setUser(user);
+      login(user);  
       setSuccess("Registration successful");
       close();
     } catch (err) {

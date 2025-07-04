@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import '../styles/PostAdPage.css';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
 
 const PostAdPage = () => {
-    
+    const { user } = useContext(AuthContext);
 const navigate=useNavigate();
   const [formData, setFormData] = useState({
     title: '',
@@ -27,13 +30,12 @@ const navigate=useNavigate();
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user'));
-
-    if (!token || !user) {
-      return setMessage("You must be logged in to post an ad.");
-    }
+  e.preventDefault();
+  // const user = JSON.parse(localStorage.getItem("user"));
+  if (!user) {
+    alert("Please login to post an ad.");
+    return;
+  }
 
     const data = new FormData();
     data.append('title', formData.title);
@@ -41,32 +43,25 @@ const navigate=useNavigate();
     data.append('price', formData.price);
     data.append('location', formData.location);
     data.append('category', formData.category);
-    data.append('userId', user._id);
+    data.append('user', user._id);
 
     for (let file of formData.images) {
       data.append('images', file);
     }
 
-    try {
-      const res = await fetch('http://localhost:5000/api/ads/post', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: data,
-      });
-      const result = await res.json();
-      if (result.success) {
-  setMessage("Ad posted successfully!");
-  setTimeout(() => {
-    navigate('/');
-  }, 1000);
-} else {
-  setMessage("Something went wrong.");
-}
-
-    } catch (err) {
-      setMessage("Failed to post ad.");
+   try {
+    const res = await axios.post("http://localhost:5001/api/ads/post", data);
+    if (res.data.success) {
+      navigate("/");
+    } else {
+      alert("Failed to post ad");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong.");
+  }
+};
+
 
   return (
     <div className="postad-container">
@@ -124,7 +119,7 @@ const navigate=useNavigate();
         <input
           type="file"
           multiple
-          accept="image/*"
+          // accept="image/*"
           onChange={handleFileChange}
         />
 
