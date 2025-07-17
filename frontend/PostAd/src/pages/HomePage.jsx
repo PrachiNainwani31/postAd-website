@@ -11,26 +11,38 @@ import { AuthContext } from '../context/AuthContext';
 const adsPerPage = 12;
 
 
-const HomePage = () => {
+const HomePage = ({ searchQuery }) => {
   const [ads, setAds] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
 
 const { user, login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const totalPages = Math.ceil(ads.length / adsPerPage);
-  const indexOfLastAd = currentPage * adsPerPage;
-  const indexOfFirstAd = indexOfLastAd - adsPerPage;
-  const currentAds = ads.slice(indexOfFirstAd, indexOfLastAd);
+ const filteredAds = ads.filter(ad =>
+  (!selectedCategory || ad.category === selectedCategory) &&
+  ad.title.toLowerCase().includes(searchQuery.toLowerCase())
+);
+
+const totalPages = Math.ceil(filteredAds.length / adsPerPage);
+const indexOfLastAd = currentPage * adsPerPage;
+const indexOfFirstAd = indexOfLastAd - adsPerPage;
+const currentAds = filteredAds.slice(indexOfFirstAd, indexOfLastAd);
 
   const handlePageChange = (pageNum) => {
     if (pageNum >= 1 && pageNum <= totalPages) {
       setCurrentPage(pageNum);
     }
   };
+
+  const handleCategoryClick = (category) => {
+  setSelectedCategory(category);
+  setCurrentPage(1); // reset to first page when filtering
+};
 
   const handlePostAdClick = () => {
     if (!user) {
@@ -50,32 +62,41 @@ const { user, login } = useContext(AuthContext);
 
   return (
     <>
-      {/* <Navbar */}
-  {/* onPostAdClick={handlePostAdClick} */}
-  {/* openLogin={() => setShowLogin(true)} */}
-{/* /> */}
-
       <div className="home-container">
         <div className="category-bar">
           <p className="category-title" onClick={() => setDropdownOpen(!dropdownOpen)}>
             <strong>CATEGORIES</strong>
           </p>
           <div className="category-buttons desktop-only">
-            <button>Services</button>
-            <button>Business Promotion</button>
-            <button>Sales</button>
-            <button>Jobs</button>
-          </div>
+  {["Services", "Business Promotion", "Sales", "Jobs"].map((cat) => (
+    <button
+      key={cat}
+      onClick={() => handleCategoryClick(cat)}
+      className={selectedCategory === cat ? 'active-category' : ''}
+    >
+      {cat}
+    </button>
+  ))}
+</div>
           {dropdownOpen && (
-            <div className="category-dropdown mobile-only">
-              <button>Services</button>
-              <button>Business Promotion</button>
-              <button>Sales</button>
-              <button>Jobs</button>
-            </div>
-          )}
-        </div>
+  <div className="category-dropdown mobile-only">
+    {["Services", "Business Promotion", "Sales", "Jobs"].map((cat) => (
+      <button
+        key={cat}
+        onClick={() => handleCategoryClick(cat)}
+        className={selectedCategory === cat ? 'active-category' : ''}
+      >
+        {cat}
+      </button>
+    ))}
+  </div>
+)}</div>
 
+{selectedCategory && (
+  <button className="clear-filter-btn" onClick={() => setSelectedCategory(null)}>
+    Show All
+  </button>
+)}
         <div className="ads-grid">
           {currentAds.map((ad, index) => (
   <AdCard key={ad._id || ad.id || index} ad={ad} />

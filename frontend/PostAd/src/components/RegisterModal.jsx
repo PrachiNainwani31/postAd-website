@@ -33,28 +33,29 @@ function RegisterModal({ close, switchToLogin}) {
 };
 
   const handleOtpVerify = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await API.post("/auth/verify-otp", {
-        contact: form.email,
-        otp
-      });
+  e.preventDefault();
+  try {
+    const res = await API.post("/auth/verify-otp", {
+      contact: form.email,
+      otp
+    });
 
-      const loginRes = await API.post("/auth/login", {
-        email: form.email,
-        password: form.password
-      });
+    const loginRes = await API.post("/auth/login", {
+      email: form.email,
+      password: form.password
+    });
 
-      const { token, user } = loginRes.data;
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      login(user);  
-      setSuccess("Registration successful");
-      close();
-    } catch (err) {
-      setError(err.response?.data?.message || "OTP verification failed");
-    }
-  };
+    const { token, user } = loginRes.data;
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+    login(user, token); // ✅ fixed here
+
+    setSuccess("Registration successful");
+    close();
+  } catch (err) {
+    setError(err.response?.data?.message || "OTP verification failed");
+  }
+};
 
   return (
     <div className="modal-overlay" onClick={close}>

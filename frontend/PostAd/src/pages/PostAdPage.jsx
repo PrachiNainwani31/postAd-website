@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import '../styles/PostAdPage.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
-
 const PostAdPage = () => {
-    const { user } = useContext(AuthContext);
-const navigate=useNavigate();
+  const { user } = useContext(AuthContext);
+const storedUser = JSON.parse(localStorage.getItem("user"));
+const fullUser = user?._id ? user : storedUser;
+
+console.log("🔍 PostAdPage user context value:", user);
+
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -30,12 +34,12 @@ const navigate=useNavigate();
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  // const user = JSON.parse(localStorage.getItem("user"));
-  if (!user) {
-    alert("Please login to post an ad.");
-    return;
-  }
+    e.preventDefault();
+
+    if (!fullUser || !fullUser._id) {
+  alert("Please login to post an ad.");
+  return;
+}
 
     const data = new FormData();
     data.append('title', formData.title);
@@ -43,31 +47,34 @@ const navigate=useNavigate();
     data.append('price', formData.price);
     data.append('location', formData.location);
     data.append('category', formData.category);
-    data.append('user', user._id);
+    data.append('user', fullUser._id); // ✅ this must not be undefined
 
     for (let file of formData.images) {
       data.append('images', file);
     }
 
-   try {
-    const res = await axios.post("http://localhost:5001/api/ads/post", data);
-    if (res.data.success) {
-      navigate("/");
-    } else {
-      alert("Failed to post ad");
+    try {
+      const res = await axios.post("http://localhost:5001/api/ads/post", data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      if (res.data.success) {
+        navigate("/");
+      } else {
+        alert("Failed to post ad");
+      }
+    } catch (err) {
+      console.error("POST error:", err);
+      const msg = err?.response?.data?.details || "Something went wrong.";
+      alert(msg);
     }
-  } catch (err) {
-    console.error(err);
-    alert("Something went wrong.");
-  }
-};
+  };
 
-
+  
   return (
     <div className="postad-container">
       <h2>Post Your Ad</h2>
       <form onSubmit={handleSubmit}>
-
         <input
           type="text"
           name="title"
@@ -119,7 +126,7 @@ const navigate=useNavigate();
         <input
           type="file"
           multiple
-          // accept="image/*"
+          accept="image/*"
           onChange={handleFileChange}
         />
 

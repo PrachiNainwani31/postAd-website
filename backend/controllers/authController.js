@@ -113,10 +113,10 @@ exports.login = async (req, res) => {
 
     const token = generateToken(user._id);
     res.json({
-      message: 'Login successful',
-      token,
-      user: { name: user.name, email: user.email }
-    });
+  message: 'Login successful',
+  token,
+  user: { _id: user._id, name: user.name, email: user.email } // ✅ include _id!
+});
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });

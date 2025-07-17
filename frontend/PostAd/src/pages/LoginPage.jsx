@@ -23,8 +23,7 @@ function LoginModal({ close, switchToRegister }) {
     setError('');                         
     setSuccess('Login successful');      
 
-    login(res.data.user);
-    localStorage.setItem("token", res.data.token);
+    login(res.data.user, res.data.token);
     close();
   } catch (err) {
     setSuccess('');                      

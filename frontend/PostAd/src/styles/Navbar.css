@@ -161,3 +161,11 @@
   }
 }
 
+.search-btn {
+  margin-left: 8px;
+  padding: 6px 12px;
+  background-color: #5b5d5b;
+  color: white;
+  border: none;
+  cursor: pointer;
+}

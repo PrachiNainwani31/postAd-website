@@ -2,13 +2,23 @@ import React, { useState, useEffect, useContext } from 'react';
 import '../styles/Navbar.css';
 import logo from '../assets/logo.jpg';
 import { AuthContext } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
-const Navbar = ({ onPostAdClick, openLogin }) => {
+const Navbar = ({ onPostAdClick, openLogin,onSearch }) => {
   const { user, login, logout, setUser } = useContext(AuthContext);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [searchTerm, setSearchTerm] = useState('');
+
+   const handleSearchInput = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleSearchSubmit = () => {
+    onSearch(searchTerm); // Send it to App.jsx
+  };
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -57,7 +67,14 @@ const Navbar = ({ onPostAdClick, openLogin }) => {
         </div>
 
         <div className="navbar-right">
-          <input type="text" className="search-input" placeholder="Search..." />
+      <input
+        type="text"
+        className="search-input"
+        placeholder="Search..."
+        value={searchTerm}
+        onChange={handleSearchInput}
+      />
+      <button className="search-btn" onClick={handleSearchSubmit}>Search</button>
           {!isMobile && (
             <div className="nav-buttons">
               <button className="btn post-btn" onClick={onPostAdClick}>Post Ad</button>
@@ -79,7 +96,9 @@ const Navbar = ({ onPostAdClick, openLogin }) => {
 
       {!isMobile && showDropdown && user && (
         <div className="dropdown-menu">
-          <button className="btn">My Ads</button>
+          {user && (
+  <button className="btn" onClick={() => window.location.href = "/myads"}>My Ads</button>
+)}
           <button className="btn" onClick={handleLogout}>Logout</button>
         </div>
       )}
@@ -91,7 +110,10 @@ const Navbar = ({ onPostAdClick, openLogin }) => {
             {user && <div className="user-avatar sidebar-avatar">{user.name?.charAt(0)}</div>}
             {user ? (
               <>
-                <button className="btn">My Ads</button>
+                <button className="btn" onClick={() => {
+  closeSidebar(); // optional: hide sidebar after navigation
+  window.location.href = "/myads";
+}}>My Ads</button>
               </>
             ) : (
               <button className="btn" onClick={openLogin}>Login/Register</button>
