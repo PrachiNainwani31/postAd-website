@@ -1,4 +1,3 @@
-// models/OTP.js
 const mongoose = require("mongoose");
 
 const OTPSchema = new mongoose.Schema({
@@ -8,7 +7,11 @@ const OTPSchema = new mongoose.Schema({
   extra: {
     name: String,
     email: String,
-    password: String
+    password: String,
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }
   }
 }, { timestamps: true });
 

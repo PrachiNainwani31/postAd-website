@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import '../styles/PostAdPage.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -6,10 +6,11 @@ import { AuthContext } from '../context/AuthContext';
 
 const PostAdPage = () => {
   const { user } = useContext(AuthContext);
-const storedUser = JSON.parse(localStorage.getItem("user"));
-const fullUser = user?._id ? user : storedUser;
-
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const fullUser = user?._id ? user : storedUser;
   const navigate = useNavigate();
+
+  const badWords = ['fuck', 'shit', 'bitch', 'damn'];
 
   const [formData, setFormData] = useState({
     title: '',
@@ -20,11 +21,19 @@ const fullUser = user?._id ? user : storedUser;
     images: [],
   });
 
+  const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [wordCount, setWordCount] = useState(0);
+
+  useEffect(() => {
+    const words = formData.description.trim().split(/\s+/);
+    setWordCount(formData.description.trim() === "" ? 0 : words.length);
+  }, [formData.description]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setError('');
   };
 
   const handleFileChange = (e) => {
@@ -35,49 +44,50 @@ const fullUser = user?._id ? user : storedUser;
     e.preventDefault();
 
     if (!fullUser || !fullUser._id) {
-  alert("Please login to post an ad.");
-  return;
-}
-
-    const data = new FormData();
-    data.append('title', formData.title);
-    data.append('description', formData.description);
-    data.append('price', formData.price);
-    data.append('location', formData.location);
-    data.append('category', formData.category);
-    data.append('user', fullUser._id); // ✅ this must not be undefined
-
-    for (let file of formData.images) {
-      data.append('images', file);
+      setError("Please login to post an ad.");
+      return;
     }
 
-    console.log("Preparing FormData...");
-for (let pair of data.entries()) {
-  console.log(pair[0] + ':', pair[1]);
-}
+    const words = formData.description.trim().split(/\s+/);
+    if (words.length < 10) {
+      setError("Description must be at least 50 words.");
+      return;
+    }
+
+    const hasBad = badWords.some(bad =>
+      formData.description.toLowerCase().includes(bad)
+    );
+    if (hasBad) {
+      setError("Description contains inappropriate language.");
+      return;
+    }
+
+    const data = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      if (key === "images") {
+        for (let file of value) {
+          data.append("images", file);
+        }
+      } else {
+        data.append(key, value);
+      }
+    });
+    data.append("user", fullUser._id);
 
     try {
-      console.log("🧪 Submitting Ad Form");
-console.log("Form fields:", formData);
-console.log("User ID being sent:", fullUser?._id);
-console.log("Images being sent:", formData.images);
-      const res = await axios.post("http://localhost:5001/api/ads/post", data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-
+      const res = await axios.post("http://localhost:5001/api/ads/post", data);
       if (res.data.success) {
         navigate("/");
       } else {
-        alert("Failed to post ad");
+        setError("Failed to post ad.");
       }
     } catch (err) {
       console.error("POST error:", err);
       const msg = err?.response?.data?.details || "Something went wrong.";
-      alert(msg);
+      setError(msg);
     }
   };
 
-  
   return (
     <div className="postad-container">
       <h2>Post Your Ad</h2>
@@ -91,13 +101,19 @@ console.log("Images being sent:", formData.images);
           required
         />
 
+        <label htmlFor="description">
+          Description <small style={{ color: '#777' }}>(Minimum 10 words, no bad language)</small>
+        </label>
         <textarea
           name="description"
           value={formData.description}
           onChange={handleChange}
-          placeholder="Description"
           required
+          rows={6}
         />
+        <small style={{ color: wordCount < 10 ? 'red' : 'green' }}>
+          Word Count: {wordCount}
+        </small>
 
         <input
           type="text"
@@ -131,13 +147,16 @@ console.log("Images being sent:", formData.images);
         </select>
 
         <input
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={handleFileChange}
-        />
+  type="file"
+  name="images"
+  multiple
+  accept="image/*"
+  onChange={handleFileChange}
+/>
+
 
         <button type="submit">Submit</button>
+        {error && <p className="error-text" style={{ color: 'red' }}>{error}</p>}
       </form>
 
       {message && <p className="message">{message}</p>}

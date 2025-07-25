@@ -7,9 +7,9 @@ import mongoose from 'mongoose';
 
 export const postAd = async (req, res) => {
   try {
-     console.log("📥 POST /api/ads/post - Incoming FormData:");
-    console.log("BODY:", req.body);
-    console.log("FILES:", req.files);
+    console.log("Incoming ad POST:");
+    console.log("Body:", req.body);
+    console.log("Files:", req.files);
 
     const { title, description, price, location, category, user } = req.body;
 
@@ -18,9 +18,13 @@ export const postAd = async (req, res) => {
     }
 
     let images = [];
-if (req.files?.length > 0) {
-  images = req.files.map(file => file.path.replace(/\\/g, '/')); // normalize path
-}
+
+    // ✅ multer puts files in req.files (array of files)
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        images.push(file.path); // multer already stores file in uploads dir
+      }
+    }
 
     const newAd = await Ad.create({
       title,
@@ -29,12 +33,12 @@ if (req.files?.length > 0) {
       location,
       category,
       images,
-      user: new mongoose.Types.ObjectId(user) // ✅ convert string to ObjectId
+      user: new mongoose.Types.ObjectId(user),
     });
 
     res.json({ success: true, ad: newAd });
   } catch (err) {
-    console.error("POST ERROR:", err.message, err.stack);
+    console.error("POST ERROR:", err);
     res.status(500).json({ error: 'Error posting ad', details: err.message });
   }
 };
@@ -83,37 +87,20 @@ export const deleteAd = async (req, res) => {
 export const updateAd = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, price, category, location } = req.body;
-    let keepImages = req.body.keepImages || [];
+    const { title, description, price, category, location, keepImages } = req.body;
+    const keepArr = typeof keepImages === 'string' ? [keepImages] : (keepImages || []);
+    const update = { title, description, price, category, location, images: [...keepArr] };
 
-    // Convert to array if only one image
-    if (typeof keepImages === 'string') keepImages = [keepImages];
-
-    const update = { title, description, price, category, location };
-
-    // Append kept images
-    let images = [...keepImages];
-
-    // Upload new images if any
-    if (req.files?.images) {
-      const files = Array.isArray(req.files.images) ? req.files.images : [req.files.images];
-      for (const file of files) {
-        const uploadsDir = path.join('uploads');
-        if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
-        const filename = `${Date.now()}_${file.name}`;
-        const uploadPath = path.join(uploadsDir, filename);
-        await file.mv(uploadPath);
-        images.push(`uploads/${filename}`);
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        update.images.push(file.path);
       }
     }
 
-    update.images = images;
-
     const ad = await Ad.findByIdAndUpdate(id, update, { new: true });
-    res.json({ success: true, ad });
+    return res.json({ success: true, ad });
   } catch (err) {
     console.error("Update failed:", err);
-    res.status(500).json({ success: false, message: 'Update failed', error: err.message });
+    res.status(500).json({ success: false, message: "Update failed", error: err.message });
   }
 };
-

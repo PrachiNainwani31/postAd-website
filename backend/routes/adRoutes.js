@@ -17,12 +17,15 @@ const router = express.Router();
 router.post('/post', upload.array('images'), postAd);
 
 // READ
+
+
 router.get('/', getAllAds);
 router.get('/:id', getAdById);
 router.get('/user/:id', getUserAds);
 
 // UPDATE
-router.put('/:id', updateAd);
+// router.put('/:id', updateAd);
+router.put('/:id', upload.array('images'), updateAd);
 
 // DELETE
 router.delete('/:id', deleteAd);

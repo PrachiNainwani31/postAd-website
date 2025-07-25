@@ -88,3 +88,27 @@
   justify-content: center;
   margin-right: 10px;
 }
+
+.forgot-link {
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.forgot-link-container {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.reset-container {
+  margin-top: 20px;
+}
+
+.resend-btn {
+  margin-top: 10px;
+  background: none;
+  color: blue;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
