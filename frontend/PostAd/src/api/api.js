@@ -1,7 +1,10 @@
 import axios from "axios";
 
+const apiUrl = process.env.VITE_API_URL; 
+
+// This is the correct and simplest way
 const API = axios.create({
-  baseURL: "http://localhost:5001/api",
+  baseURL: apiUrl,
 });
 
 export default API;
