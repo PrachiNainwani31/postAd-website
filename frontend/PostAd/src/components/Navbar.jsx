@@ -4,21 +4,18 @@ import logo from '../assets/logo.jpg';
 import { AuthContext } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 
-const Navbar = ({ onPostAdClick, openLogin,onSearch }) => {
+const Navbar = ({ onPostAdClick, openLogin, onSearch }) => {
   const { user, login, logout, setUser } = useContext(AuthContext);
+  const isAdmin = user?.role === 'admin';
+  const avatarLabel = isAdmin ? 'admin' : user?.name?.charAt(0);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [searchTerm, setSearchTerm] = useState('');
 
-   const handleSearchInput = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const handleSearchSubmit = () => {
-    onSearch(searchTerm); // Send it to App.jsx
-  };
+  const handleSearchInput = (e) => setSearchTerm(e.target.value);
+  const handleSearchSubmit = () => onSearch(searchTerm);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -34,11 +31,8 @@ const Navbar = ({ onPostAdClick, openLogin,onSearch }) => {
       })
         .then(res => res.json())
         .then(data => {
-          if (data.valid) {
-            setUser(data.user);
-          } else {
-            logout();
-          }
+          if (data.valid) setUser(data.user);
+          else logout();
         })
         .catch(() => logout());
     }
@@ -67,20 +61,33 @@ const Navbar = ({ onPostAdClick, openLogin,onSearch }) => {
         </div>
 
         <div className="navbar-right">
-      <input
-        type="text"
-        className="search-input"
-        placeholder="Search..."
-        value={searchTerm}
-        onChange={handleSearchInput}
-      />
-      <button className="search-btn" onClick={handleSearchSubmit}>Search</button>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={handleSearchInput}
+          />
+          <button className="search-btn" onClick={handleSearchSubmit}>Search</button>
+
           {!isMobile && (
             <div className="nav-buttons">
-              <button className="btn post-btn" onClick={onPostAdClick}>Post Ad</button>
+              <button
+                className="btn post-btn"
+                onClick={() => {
+                  if (isAdmin) {
+                    window.location.href = "/admin/users";
+                  } else {
+                    onPostAdClick();
+                  }
+                }}
+              >
+                {isAdmin ? 'Users' : 'Post Ad'}
+              </button>
+
               {user ? (
                 <div className="user-avatar" onClick={toggleSidebar}>
-                  {user.name?.charAt(0)}
+                  {avatarLabel}
                 </div>
               ) : (
                 <button className="btn" onClick={openLogin}>Login/Register</button>
@@ -88,17 +95,19 @@ const Navbar = ({ onPostAdClick, openLogin,onSearch }) => {
               <div className="hamburger" onClick={toggleSidebar}>☰</div>
             </div>
           )}
-          {isMobile && (
-            <div className="hamburger" onClick={toggleSidebar}>☰</div>
-          )}
+
+          {isMobile && <div className="hamburger" onClick={toggleSidebar}>☰</div>}
         </div>
       </nav>
 
       {!isMobile && showDropdown && user && (
         <div className="dropdown-menu">
-          {user && (
-  <button className="btn" onClick={() => window.location.href = "/myads"}>My Ads</button>
-)}
+          <button
+            className="btn"
+            onClick={() => window.location.href = isAdmin ? "/admin/ads" : "/myads"}
+          >
+            {isAdmin ? "Ads" : "My Ads"}
+          </button>
           <button className="btn" onClick={handleLogout}>Logout</button>
         </div>
       )}
@@ -107,19 +116,36 @@ const Navbar = ({ onPostAdClick, openLogin,onSearch }) => {
         <>
           <div className="overlay" onClick={closeSidebar}></div>
           <div className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-            {user && <div className="user-avatar sidebar-avatar">{user.name?.charAt(0)}</div>}
+            {user && <div className="user-avatar sidebar-avatar">{avatarLabel}</div>}
+
             {user ? (
-              <>
-                <button className="btn" onClick={() => {
-  closeSidebar(); // optional: hide sidebar after navigation
-  window.location.href = "/myads";
-}}>My Ads</button>
-              </>
+              <button
+                className="btn"
+                onClick={() => window.location.href = isAdmin ? "/admin/ads" : "/myads"}
+              >
+                {isAdmin ? "Ads" : "My Ads"}
+              </button>
             ) : (
               <button className="btn" onClick={openLogin}>Login/Register</button>
             )}
-            <button className="btn post-btn" onClick={onPostAdClick} disabled={!user}>Post Ad</button>
+
+            <button
+              className="btn post-btn"
+              onClick={() => {
+                if (isAdmin) {
+                  window.location.href = "/admin/users";
+                } else {
+                  onPostAdClick();
+                }
+                closeSidebar();
+              }}
+              disabled={!user}
+            >
+              {isAdmin ? 'Users' : 'Post Ad'}
+            </button>
+
             <div className="spacer" style={{ flexGrow: 1 }}></div>
+
             {user && <button className="btn logout-btn" onClick={handleLogout}>Logout</button>}
           </div>
         </>

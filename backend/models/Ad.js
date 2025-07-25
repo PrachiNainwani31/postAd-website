@@ -7,6 +7,11 @@ const adSchema = new mongoose.Schema({
   location: String,
   category: String,
   images: [String],
+  status: {
+  type: String,
+  enum: ['pending', 'approved', 'rejected'],
+  default: 'pending'
+},
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 },{ timestamps: true });
 

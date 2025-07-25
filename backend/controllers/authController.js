@@ -41,6 +41,10 @@ exports.register = async (req, res) => {
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ message: 'User already exists' });
 
+    if (email === 'prachinainwnai31@gmail.com') {
+  return res.status(403).json({ message: 'Admin cannot register from frontend' });
+}
+
     const otpCode = generateOTP();
 
     // Store in OTP model temporarily
@@ -65,6 +69,10 @@ exports.verifyOtp = async (req, res) => {
   const { contact, otp } = req.body;
   console.log("VERIFY OTP request body:", req.body);
 
+  if (email === 'prachinainwnai31@gmail.com') {
+  return res.status(403).json({ message: 'Admin cannot verify OTP from frontend' });
+}
+
   try {
     const record = await OTP.findOne({ contact }).sort({ createdAt: -1 });
     if (!record) {
@@ -88,7 +96,7 @@ exports.verifyOtp = async (req, res) => {
     }
 
     const { name, email, password } = record.extra;
-    const user = await User.create({ name, email, password, isVerified: true });
+    const user = await User.create({ name, email, password, role: 'user', isVerified: true });
     await OTP.deleteMany({ contact });
 
     const token = generateToken(user._id);
@@ -108,6 +116,12 @@ exports.login = async (req, res) => {
     if (!user) return res.status(400).json({ message: 'User not found' });
     if (!user.isVerified) return res.status(403).json({ message: 'Please verify OTP first' });
 
+     if (email === 'prachinainwnai31@gmail.com') {
+  if (user.role !== 'admin') {
+    user.role = 'admin';
+    await user.save(); // Save updated role to DB
+  }
+}
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: 'Incorrect password' });
 
@@ -115,10 +129,52 @@ exports.login = async (req, res) => {
     res.json({
   message: 'Login successful',
   token,
-  user: { _id: user._id, name: user.name, email: user.email } // ✅ include _id!
+  user: { _id: user._id, name: user.name, email: user.email,role:user.role } // ✅ include _id!
 });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// Step 1: Forgot Password - send OTP only if email exists
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email || !validateEmail(email))
+    return res.status(400).json({ message: 'Invalid email format' });
+
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ message: 'User not registered' });
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  await OTP.deleteMany({ contact: email });
+  await OTP.create({
+    contact: email,
+    otp,
+    extra: { userId: user._id },
+    expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+  });
+  await sendEmailOTP(email, otp);
+  res.json({ message: 'OTP sent to email' });
+};
+
+// Step 2: Reset Password using OTP
+exports.resetPassword = async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+  if (!email || !otp || !newPassword) return res.status(400).json({ message: 'All fields required' });
+
+  const record = await OTP.findOne({ contact: email }).sort({ createdAt: -1 });
+  if (!record || record.otp !== otp) return res.status(400).json({ message: 'Invalid or expired OTP' });
+
+  const hashed = await bcrypt.hash(newPassword, 10);
+  await User.findByIdAndUpdate(record.extra.userId, { password: hashed });
+  await OTP.deleteMany({ contact: email });
+  res.json({ message: 'Password reset successful' });
+};
+
+function validateEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+
+

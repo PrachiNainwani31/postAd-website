@@ -9,8 +9,6 @@ const PostAdPage = () => {
 const storedUser = JSON.parse(localStorage.getItem("user"));
 const fullUser = user?._id ? user : storedUser;
 
-console.log("🔍 PostAdPage user context value:", user);
-
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -53,7 +51,16 @@ console.log("🔍 PostAdPage user context value:", user);
       data.append('images', file);
     }
 
+    console.log("Preparing FormData...");
+for (let pair of data.entries()) {
+  console.log(pair[0] + ':', pair[1]);
+}
+
     try {
+      console.log("🧪 Submitting Ad Form");
+console.log("Form fields:", formData);
+console.log("User ID being sent:", fullUser?._id);
+console.log("Images being sent:", formData.images);
       const res = await axios.post("http://localhost:5001/api/ads/post", data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
