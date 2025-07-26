@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import API from "../api/api"; // ✅ CHANGED: Import your central API instance
-// import axios from "axios"; // 🛑 REMOVED: No longer need direct axios
+import API from "../api/api"; // 
 
 export default function AdminAllAds() {
   const [ads, setAds] = useState([]);

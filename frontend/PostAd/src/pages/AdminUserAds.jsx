@@ -23,7 +23,7 @@ function AdminUserAds() {
   }, [id]);
 
   const updateStatus = (adId, status) => {
-    // ✅ CHANGED: Use the API instance
+    // CHANGED: Use the API instance
     API.put(`/admin/ads/${adId}/status`, { status }, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -34,7 +34,7 @@ function AdminUserAds() {
   };
 
   const deleteAd = (adId) => {
-    // ✅ CHANGED: Use the API instance
+    //  CHANGED: Use the API instance
     API.delete(`/ads/${adId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -54,7 +54,7 @@ function AdminUserAds() {
         <div className="ads-grid">
           {ads.map(ad => (
             <div key={ad._id} className="ad-card">
-              {/* ✅ CHANGED: Use the Cloudinary URL directly */}
+              {/*  CHANGED: Use the Cloudinary URL directly */}
               {ad.images && ad.images.length > 0 && (
                 <img
                   src={ad.images[0]}

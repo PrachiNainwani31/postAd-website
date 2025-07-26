@@ -132,7 +132,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// ✅ Forgot Password (Send OTP)
+//  Forgot Password (Send OTP)
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
   if (!validateEmail(email)) return res.status(400).json({ message: 'Invalid email format' });
