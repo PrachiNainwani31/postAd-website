@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import API from '../api/api'; // CHANGED: Import your central API instance
 import '../styles/EditAdModal.css';
 
 const categories = ["Services", "Business Promotion", "Sales", "Jobs"];
@@ -32,19 +32,16 @@ function EditAdModal({ ad, onSave, onCancel }) {
     e.preventDefault();
     const formData = new FormData();
 
-    // Append basic fields
     for (const key in form) {
       formData.append(key, form[key]);
     }
 
-    // Keep only the selected existing images
     existingImages.forEach(img => formData.append('keepImages', img));
-
-    // Add new files
     newImages.forEach(file => formData.append('images', file));
 
     try {
-      const res = await axios.put(`http://localhost:5001/api/ads/${ad._id}`, formData);
+      // CHANGED: Use the API instance and the correct relative path
+      const res = await API.put(`/ads/${ad._id}`, formData);
       onSave(res.data.ad);
     } catch (err) {
       console.error('Update failed:', err);
@@ -55,41 +52,21 @@ function EditAdModal({ ad, onSave, onCancel }) {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <form className="edit-ad-form" onSubmit={handleSubmit} encType="multipart/form-data">
+        <form className="edit-ad-form" onSubmit={handleSubmit}>
           <h2>Edit Ad</h2>
 
+          {/* ... all your input fields for title, description, etc. ... */}
           <label htmlFor="title">Title:</label>
-          <input
-            name="title"
-            value={form.title}
-            onChange={handleInputChange}
-            required
-          />
+          <input name="title" value={form.title} onChange={handleInputChange} required />
 
           <label htmlFor="description">Description:</label>
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={handleInputChange}
-            required
-          />
-
+          <textarea name="description" value={form.description} onChange={handleInputChange} required />
+          
           <label htmlFor="price">Price (₹):</label>
-          <input
-            type="number"
-            name="price"
-            value={form.price}
-            onChange={handleInputChange}
-            required
-          />
-
+          <input type="number" name="price" value={form.price} onChange={handleInputChange} required />
+          
           <label htmlFor="location">Location:</label>
-          <input
-            name="location"
-            value={form.location}
-            onChange={handleInputChange}
-            required
-          />
+          <input name="location" value={form.location} onChange={handleInputChange} required />
 
           <label htmlFor="category">Category:</label>
           <select name="category" value={form.category} onChange={handleInputChange} required>
@@ -99,11 +76,13 @@ function EditAdModal({ ad, onSave, onCancel }) {
             ))}
           </select>
 
+
           <label>Existing Images:</label>
           <div className="existing-images-preview">
             {existingImages.map((img, index) => (
               <div key={index} className="image-thumb">
-                <img src={`http://localhost:5001/${img}`} alt="ad preview" />
+                {/* CHANGED: Use the full Cloudinary URL directly */}
+                <img src={img} alt="ad preview" />
                 <button type="button" onClick={() => handleRemoveExistingImage(index)}>✖</button>
               </div>
             ))}

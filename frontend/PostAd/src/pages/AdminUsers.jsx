@@ -1,32 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import API from '../api/api'; // ✅ CHANGED: Import your central API instance
 import UserRow from '../components/userRow';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
 export default function AdminUsers() {
-  const { isAdmin, user } = useAuth();
+  const { isAdmin } = useAuth();
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isAdmin) {
-      axios
-        .get('http://localhost:5001/api/admin/users', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        })
+      // ✅ CHANGED: Use the API instance
+      API.get('/admin/users', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      })
         .then((res) => setUsers(res.data))
         .catch((err) => console.error("Failed to fetch users:", err));
     } else {
       navigate('/'); // redirect if not admin
     }
-  }, [isAdmin]);
+  }, [isAdmin, navigate]);
 
   const deleteUser = async (id) => {
     try {
-      await axios.delete(`http://localhost:5001/api/admin/users/${id}`, {
+      // ✅ CHANGED: Use the API instance
+      await API.delete(`/admin/users/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },

@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import '../styles/PostAdPage.css';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import API from '../api/api'; // ✅ CHANGED: Import your central API instance
 import { AuthContext } from '../context/AuthContext';
 
 const PostAdPage = () => {
@@ -50,7 +50,7 @@ const PostAdPage = () => {
 
     const words = formData.description.trim().split(/\s+/);
     if (words.length < 10) {
-      setError("Description must be at least 0 words.");
+      setError("Description must be at least 10 words.");
       return;
     }
 
@@ -75,7 +75,8 @@ const PostAdPage = () => {
     data.append("user", fullUser._id);
 
     try {
-      const res = await axios.post("http://localhost:5001/api/ads/post", data);
+      // ✅ CHANGED: Use the API instance to post to the live backend
+      const res = await API.post("/ads/post", data);
       if (res.data.success) {
         navigate("/");
       } else {
@@ -147,13 +148,12 @@ const PostAdPage = () => {
         </select>
 
         <input
-  type="file"
-  name="images"
-  multiple
-  accept="image/*"
-  onChange={handleFileChange}
-/>
-
+          type="file"
+          name="images"
+          multiple
+          accept="image/*"
+          onChange={handleFileChange}
+        />
 
         <button type="submit">Submit</button>
         {error && <p className="error-text" style={{ color: 'red' }}>{error}</p>}

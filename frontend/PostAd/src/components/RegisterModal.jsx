@@ -48,7 +48,7 @@ function RegisterModal({ close, switchToLogin}) {
     const { token, user } = loginRes.data;
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
-    login(user, token); // ✅ fixed here
+    login(user, token); //  fixed here
 
     setSuccess("Registration successful");
     close();

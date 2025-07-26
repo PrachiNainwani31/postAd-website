@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import axios from 'axios';
+import API from '../api/api'; // ✅ CHANGED: Import your central API instance
 import { AuthContext } from '../context/AuthContext';
 import EditAdModal from '../components/EditAdModal';
 import Footer from '../components/Footer';
@@ -12,7 +12,8 @@ const MyAds = () => {
 
   useEffect(() => {
     if (user?._id) {
-      axios.get(`http://localhost:5001/api/ads/user/${user._id}`)
+      // ✅ CHANGED: Use the API instance
+      API.get(`/ads/user/${user._id}`)
         .then(res => setAds(res.data))
         .catch(err => console.error("Error fetching user ads:", err));
     }
@@ -20,7 +21,8 @@ const MyAds = () => {
 
   const handleDelete = async (adId) => {
     try {
-      await axios.delete(`http://localhost:5001/api/ads/${adId}`);
+      // ✅ CHANGED: Use the API instance
+      await API.delete(`/ads/${adId}`);
       setAds(prev => prev.filter(ad => ad._id !== adId));
     } catch (err) {
       console.error("Delete failed:", err);
@@ -42,7 +44,10 @@ const MyAds = () => {
             {ads.map(ad => (
               <div key={ad._id} className="ad-row">
                 <div className="ad-card">
-                  <img src={`http://localhost:5001/${ad.images?.[0]}`} alt={ad.title} />
+                  {/* CHANGED: Use the Cloudinary URL directly */}
+                  {ad.images && ad.images.length > 0 && (
+                    <img src={ad.images[0]} alt={ad.title} />
+                  )}
                   <div className="ad-content">
                     <h3>{ad.title}</h3>
                     <p><strong>₹ {ad.price}</strong></p>

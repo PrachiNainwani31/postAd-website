@@ -1,4 +1,4 @@
-import React, { useState,useEffect,useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import AdCard from '../components/AdCard';
@@ -7,9 +7,9 @@ import '../styles/HomePage.css';
 import LoginModal from '../pages/LoginPage';
 import RegisterModal from '../components/RegisterModal';
 import { AuthContext } from '../context/AuthContext';
+import API from '../api/api'; // ✅ CHANGED: Import your central API instance
 
 const adsPerPage = 12;
-
 
 const HomePage = ({ searchQuery }) => {
   const [ads, setAds] = useState([]);
@@ -19,19 +19,18 @@ const HomePage = ({ searchQuery }) => {
   const [showRegister, setShowRegister] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-
-const { user, login } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
- const filteredAds = ads.filter(ad =>
-  (!selectedCategory || ad.category === selectedCategory) &&
-  ad.title.toLowerCase().includes(searchQuery.toLowerCase())
-);
+  const filteredAds = ads.filter(ad =>
+    (!selectedCategory || ad.category === selectedCategory) &&
+    ad.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-const totalPages = Math.ceil(filteredAds.length / adsPerPage);
-const indexOfLastAd = currentPage * adsPerPage;
-const indexOfFirstAd = indexOfLastAd - adsPerPage;
-const currentAds = filteredAds.slice(indexOfFirstAd, indexOfLastAd);
+  const totalPages = Math.ceil(filteredAds.length / adsPerPage);
+  const indexOfLastAd = currentPage * adsPerPage;
+  const indexOfFirstAd = indexOfLastAd - adsPerPage;
+  const currentAds = filteredAds.slice(indexOfFirstAd, indexOfLastAd);
 
   const handlePageChange = (pageNum) => {
     if (pageNum >= 1 && pageNum <= totalPages) {
@@ -40,9 +39,9 @@ const currentAds = filteredAds.slice(indexOfFirstAd, indexOfLastAd);
   };
 
   const handleCategoryClick = (category) => {
-  setSelectedCategory(category);
-  setCurrentPage(1); // reset to first page when filtering
-};
+    setSelectedCategory(category);
+    setCurrentPage(1);
+  };
 
   const handlePostAdClick = () => {
     if (!user) {
@@ -52,12 +51,18 @@ const currentAds = filteredAds.slice(indexOfFirstAd, indexOfLastAd);
     }
   };
 
+  // ✅ CHANGED: Use the API instance to fetch ads from the live backend
   useEffect(() => {
-  fetch('http://localhost:5001/api/ads')
-    .then(res => res.json())
-    .then(data => setAds(data))
-    .catch(err => console.log(err));
-}, []);
+    const fetchAds = async () => {
+      try {
+        const res = await API.get('/ads'); 
+        setAds(res.data);
+      } catch (err) {
+        console.error("Failed to fetch ads:", err);
+      }
+    };
+    fetchAds();
+  }, []);
 
 
   return (
@@ -68,40 +73,40 @@ const currentAds = filteredAds.slice(indexOfFirstAd, indexOfLastAd);
             <strong>CATEGORIES</strong>
           </p>
           <div className="category-buttons desktop-only">
-  {["Services", "Business Promotion", "Sales", "Jobs"].map((cat) => (
-    <button
-      key={cat}
-      onClick={() => handleCategoryClick(cat)}
-      className={selectedCategory === cat ? 'active-category' : ''}
-    >
-      {cat}
-    </button>
-  ))}
-</div>
+            {["Services", "Business Promotion", "Sales", "Jobs"].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => handleCategoryClick(cat)}
+                className={selectedCategory === cat ? 'active-category' : ''}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
           {dropdownOpen && (
-  <div className="category-dropdown mobile-only">
-    {["Services", "Business Promotion", "Sales", "Jobs"].map((cat) => (
-      <button
-        key={cat}
-        onClick={() => handleCategoryClick(cat)}
-        className={selectedCategory === cat ? 'active-category' : ''}
-      >
-        {cat}
-      </button>
-    ))}
-  </div>
-)}</div>
+            <div className="category-dropdown mobile-only">
+              {["Services", "Business Promotion", "Sales", "Jobs"].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => handleCategoryClick(cat)}
+                  className={selectedCategory === cat ? 'active-category' : ''}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
-{selectedCategory && (
-  <button className="clear-filter-btn" onClick={() => setSelectedCategory(null)}>
-    Show All
-  </button>
-)}
+        {selectedCategory && (
+          <button className="clear-filter-btn" onClick={() => setSelectedCategory(null)}>
+            Show All
+          </button>
+        )}
         <div className="ads-grid">
           {currentAds.map((ad, index) => (
-  <AdCard key={ad._id || ad.id || index} ad={ad} />
-))}
-
+            <AdCard key={ad._id || index} ad={ad} />
+          ))}
         </div>
 
         <div className="pagination">
@@ -128,13 +133,12 @@ const currentAds = filteredAds.slice(indexOfFirstAd, indexOfLastAd);
       <Footer />
 
       {showLogin && (
-        <LoginModal
+        <LoginPage
           close={() => setShowLogin(false)}
           switchToRegister={() => {
             setShowLogin(false);
             setShowRegister(true);
           }}
-          // setUser={setUser}
         />
       )}
 
@@ -145,7 +149,6 @@ const currentAds = filteredAds.slice(indexOfFirstAd, indexOfLastAd);
             setShowRegister(false);
             setShowLogin(true);
           }}
-          // setUser={setUser}
         />
       )}
     </>

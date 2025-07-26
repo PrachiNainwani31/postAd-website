@@ -1,17 +1,10 @@
-// controllers/adController.js
 import Ad from '../models/Ad.js';
-import path from 'path';
-import fs from 'fs';
-
 import mongoose from 'mongoose';
-const BASE_URL = process.env.BASE_URL || 'https://postad-website-production.up.railway.app';
+
+// REMOVED: path, fs, and BASE_URL are no longer needed here.
 
 export const postAd = async (req, res) => {
   try {
-    console.log("Incoming ad POST:");
-    console.log("Body:", req.body);
-    console.log("Files:", req.files);
-
     const { title, description, price, location, category, user } = req.body;
 
     if (!title || !description || !price || !location || !category || !user) {
@@ -20,12 +13,9 @@ export const postAd = async (req, res) => {
 
     let images = [];
 
-    // multer puts files in req.files (array of files)
+    // CHANGED: Get the secure URL directly from file.path provided by Cloudinary
     if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-       const publicPath = `${BASE_URL}/uploads/${path.basename(file.path)}`;
-        images.push(publicPath);
-      }
+      images = req.files.map(file => file.path); 
     }
 
     const newAd = await Ad.create({
@@ -40,9 +30,10 @@ export const postAd = async (req, res) => {
 
     res.json({ success: true, ad: newAd });
   } catch (err) {
-    console.error("POST ERROR:", err);
-    res.status(500).json({ error: 'Error posting ad', details: err.message });
-  }
+  // This will print the full, detailed error message and stack trace
+  console.error("FULL POST ERROR:", err); 
+  res.status(500).json({ error: 'Error posting ad', details: err.message });
+}
 };
 
 export const getAdById = async (req, res) => {
@@ -54,7 +45,6 @@ export const getAdById = async (req, res) => {
   }
 };
 
-// GET all approved ads for homepage
 export const getAllAds = async (req, res) => {
   try {
     const ads = await Ad.find({ status: 'approved' })
@@ -65,7 +55,6 @@ export const getAllAds = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch ads' });
   }
 };
-
 
 export const getUserAds = async (req, res) => {
   try {
@@ -93,11 +82,10 @@ export const updateAd = async (req, res) => {
     const keepArr = typeof keepImages === 'string' ? [keepImages] : (keepImages || []);
     const update = { title, description, price, category, location, images: [...keepArr] };
 
+    // CHANGED: Get the secure URL directly from file.path provided by Cloudinary
     if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const publicPath = `${BASE_URL}/uploads/${path.basename(file.path)}`;
-        update.images.push(publicPath);
-      }
+      const newImageUrls = req.files.map(file => file.path);
+      update.images.push(...newImageUrls);
     }
 
     const ad = await Ad.findByIdAndUpdate(id, update, { new: true });

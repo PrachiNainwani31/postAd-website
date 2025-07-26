@@ -11,12 +11,12 @@ import AdminUsers from './pages/AdminUsers';
 import AdminUserAds from './pages/AdminUserAds';
 import AdminAllAds from './pages/AdminAllAds';
 import { AuthContext } from './context/AuthContext';
-import { useAuth } from './hooks/useAuth'; // ✅ Custom hook for admin check
+import { useAuth } from './hooks/useAuth'; //  Custom hook for admin check
 import './App.css';
 
 function App() {
   const { user } = useContext(AuthContext);
-  const { isAdmin } = useAuth(); // ✅ use role-based logic
+  const { isAdmin } = useAuth(); //  use role-based logic
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState("login");

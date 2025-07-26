@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import '../styles/LoginPage.css';
 import API from '../api/api';
-import axios from 'axios';
+// import axios from 'axios'; // 🛑 REMOVED: No longer needed
 import { AuthContext } from '../context/AuthContext';
 
 function LoginModal({ close, switchToRegister }) {
@@ -44,7 +44,8 @@ function LoginModal({ close, switchToRegister }) {
 
   const handleSendOtp = async () => {
     try {
-      await axios.post('http://localhost:5001/api/auth/forgot-password', { email: form.email });
+      // ✅ CHANGED: Use the API instance
+      await API.post('/auth/forgot-password', { email: form.email });
       setResetMessage(`OTP sent to ${form.email}`);
       setResetStep('sent');
     } catch (err) {
@@ -54,7 +55,8 @@ function LoginModal({ close, switchToRegister }) {
 
   const handleVerifyOtp = async () => {
     try {
-      await axios.post('http://localhost:5001/api/auth/reset-password', {
+      // ✅ CHANGED: Use the API instance
+      await API.post('/auth/reset-password', {
         email: form.email,
         otp,
         newPassword

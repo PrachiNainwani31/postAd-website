@@ -1,28 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import API from '../api/api'; // ✅ CHANGED: Import your central API instance
+// import axios from 'axios'; // 🛑 REMOVED: No longer need direct axios
 
 function AdminUserAds() {
   const { id } = useParams();
   const [ads, setAds] = useState([]);
-const [userName, setUserName] = useState("");
+  const [userName, setUserName] = useState("");
 
-useEffect(() => {
-  axios.get(`http://localhost:5001/api/admin/users/${id}/ads`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-  })
-    .then(res => {
-      setAds(res.data.ads || []);
-      setUserName(res.data.userName || "User");
+  useEffect(() => {
+    // ✅ CHANGED: Use the API instance
+    API.get(`/admin/users/${id}/ads`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
     })
-    .catch(err => console.error("Failed to load ads:", err));
-}, [id]);
-
+      .then(res => {
+        setAds(res.data.ads || []);
+        setUserName(res.data.userName || "User");
+      })
+      .catch(err => console.error("Failed to load ads:", err));
+  }, [id]);
 
   const updateStatus = (adId, status) => {
-    axios.put(`http://localhost:5001/api/admin/ads/${adId}/status`, { status }, {
+    // ✅ CHANGED: Use the API instance
+    API.put(`/admin/ads/${adId}/status`, { status }, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
@@ -32,7 +34,8 @@ useEffect(() => {
   };
 
   const deleteAd = (adId) => {
-    axios.delete(`http://localhost:5001/api/ads/${adId}`, {
+    // ✅ CHANGED: Use the API instance
+    API.delete(`/ads/${adId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
@@ -51,11 +54,14 @@ useEffect(() => {
         <div className="ads-grid">
           {ads.map(ad => (
             <div key={ad._id} className="ad-card">
-              <img
-                src={`http://localhost:5001/${ad.images?.[0]}`}
-                alt={ad.title}
-                style={{ width: '100%', height: '180px', objectFit: 'cover' }}
-              />
+              {/* ✅ CHANGED: Use the Cloudinary URL directly */}
+              {ad.images && ad.images.length > 0 && (
+                <img
+                  src={ad.images[0]}
+                  alt={ad.title}
+                  style={{ width: '100%', height: '180px', objectFit: 'cover' }}
+                />
+              )}
               <div className="ad-card-content">
                 <h3>{ad.title}</h3>
                 <p><strong>₹{ad.price}</strong></p>

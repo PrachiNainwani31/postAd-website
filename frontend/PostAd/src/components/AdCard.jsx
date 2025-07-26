@@ -11,7 +11,11 @@ const AdCard = ({ ad }) => {
 
   return (
     <div className="ad-card" onClick={handleClick}>
-      <img src={`http://localhost:5001/${ad.images[0]}`} alt={ad.title} />
+      {/*  CHANGED: Use the full URL from ad.images[0] directly */}
+      {/* Also added a check to prevent errors if an ad has no images */}
+      {ad.images && ad.images.length > 0 && (
+        <img src={ad.images[0]} alt={ad.title} />
+      )}
       <div className="ad-card-content">
         <p className="price">₹ {ad.price}</p>
         <h3>{ad.title}</h3>
