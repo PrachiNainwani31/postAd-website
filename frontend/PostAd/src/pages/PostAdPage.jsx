@@ -50,7 +50,7 @@ const PostAdPage = () => {
 
     const words = formData.description.trim().split(/\s+/);
     if (words.length < 10) {
-      setError("Description must be at least 50 words.");
+      setError("Description must be at least 0 words.");
       return;
     }
 
