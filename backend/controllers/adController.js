@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 
 import mongoose from 'mongoose';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:5001';
 
 export const postAd = async (req, res) => {
   try {
@@ -19,10 +20,11 @@ export const postAd = async (req, res) => {
 
     let images = [];
 
-    // ✅ multer puts files in req.files (array of files)
+    // multer puts files in req.files (array of files)
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
-        images.push(file.path); // multer already stores file in uploads dir
+       const publicPath = `${BASE_URL}/uploads/${path.basename(file.path)}`;
+        images.push(publicPath);
       }
     }
 
@@ -93,7 +95,8 @@ export const updateAd = async (req, res) => {
 
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
-        update.images.push(file.path);
+        const publicPath = `${BASE_URL}/uploads/${path.basename(file.path)}`;
+        update.images.push(publicPath);
       }
     }
 

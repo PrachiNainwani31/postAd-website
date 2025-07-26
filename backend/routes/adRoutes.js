@@ -17,8 +17,6 @@ const router = express.Router();
 router.post('/post', upload.array('images'), postAd);
 
 // READ
-
-
 router.get('/', getAllAds);
 router.get('/:id', getAdById);
 router.get('/user/:id', getUserAds);
