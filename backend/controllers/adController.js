@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 
 import mongoose from 'mongoose';
-const BASE_URL = process.env.BASE_URL || 'http://localhost:5001';
+const BASE_URL = process.env.BASE_URL || 'https://postad-website-production.up.railway.app';
 
 export const postAd = async (req, res) => {
   try {
