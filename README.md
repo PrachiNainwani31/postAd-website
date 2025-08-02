@@ -106,13 +106,12 @@ npm run dev
 
 
 markdown
-![Homepage](screenshots/Homepage.png)
-![Login Page](screenshots/login.png)
-![Register Page](screenshots/register.png)
-![Post Ad Page](screenshots/post-ad.png)
-![Search & Filter](screenshots/search-filter.png)
-![Ad Details](screenshots/ad-details.png)
-![Postman API Test](screenshots/postman-test.png)
+![Homepage](screenshots/HomePage.png)
+![Login Page](screenshots/LoginPage.png)
+![Register Page](screenshots/Register.png)
+![Post Ad Page](screenshots/PostAdPage.png)
+![Search & Filter](screenshots/SearchandFilter.png)
+![Ad Details](screenshots/AdDetails.png)
 ### Future Improvements
 - Add breadcrumbs and advanced navigation.
 - Improve UI for mobile responsiveness.
