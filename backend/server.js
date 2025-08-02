@@ -2,7 +2,6 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
-
 import authRoutes from './routes/authRoutes.js';
 import adRoutes from './routes/adRoutes.js';
 import path from 'path';
@@ -20,8 +19,6 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/ads', adRoutes);
-
-
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);

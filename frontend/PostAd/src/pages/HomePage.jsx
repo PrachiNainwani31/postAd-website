@@ -7,7 +7,7 @@ import '../styles/HomePage.css';
 import LoginModal from '../pages/LoginPage';
 import RegisterModal from '../components/RegisterModal';
 import { AuthContext } from '../context/AuthContext';
-import API from '../api/api'; //  CHANGED: Import your central API instance
+import API from '../api/api'; 
 
 const adsPerPage = 12;
 
@@ -51,7 +51,6 @@ const HomePage = ({ searchQuery }) => {
     }
   };
 
-  // CHANGED: Use the API instance to fetch ads from the live backend
   useEffect(() => {
     const fetchAds = async () => {
       try {

@@ -3,11 +3,10 @@ import dotenv from 'dotenv';
 import cloudinary from 'cloudinary';
 import fs from 'fs';
 import path from 'path';
-import Ad from './models/Ad.js'; // Make sure this path is correct
+import Ad from './models/Ad.js'; 
 
 dotenv.config();
 
-// Configure Cloudinary
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -17,20 +16,19 @@ cloudinary.v2.config({
 const migrateImages = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log('✅ MongoDB Connected for final migration...');
+    console.log('MongoDB Connected for final migration...');
 
     const localUploadsPath = path.join(process.cwd(), 'uploads');
     if (!fs.existsSync(localUploadsPath)) {
-      console.error(`❌ Error: 'uploads' folder not found at ${localUploadsPath}`);
+      console.error(`Error: 'uploads' folder not found at ${localUploadsPath}`);
       return;
     }
-    console.log(`📂 Found local images folder: ${localUploadsPath}`);
+    console.log(`Found local images folder: ${localUploadsPath}`);
 
-    // ✅ CHANGED: Find all ads where the image URL does NOT start with "https://"
     const adsToMigrate = await Ad.find({ "images": { $not: /^https:\/\// } });
 
     if (adsToMigrate.length === 0) {
-      console.log('✅ No ads with old URLs found. Nothing to migrate.');
+      console.log('No ads with old URLs found. Nothing to migrate.');
       return;
     }
 
@@ -41,7 +39,6 @@ const migrateImages = async () => {
       let wasModified = false;
 
       for (const oldUrlOrPath of ad.images) {
-        // Handle both full URLs and simple paths like "uploads/..."
         const filename = path.basename(oldUrlOrPath);
         const localFilePath = path.join(localUploadsPath, filename);
 
@@ -54,25 +51,25 @@ const migrateImages = async () => {
           console.log(`    => Success: ${result.secure_url}`);
           wasModified = true;
         } else {
-          console.warn(`    => ⚠️ Warning: Local file not found for ${filename}`);
-          newImageUrls.push(oldUrlOrPath); // Keep the old path if file is missing
+          console.warn(`    => Warning: Local file not found for ${filename}`);
+          newImageUrls.push(oldUrlOrPath);
         }
       }
 
       if (wasModified) {
         ad.images = newImageUrls;
         await ad.save();
-        console.log(`  ✅ Database updated for ad: ${ad._id}`);
+        console.log(`Database updated for ad: ${ad._id}`);
       }
     }
 
     console.log('\nFinal migration script finished successfully!');
 
   } catch (error) {
-    console.error('❌ An error occurred during migration:', error);
+    console.error('An error occurred during migration:', error);
   } finally {
     await mongoose.disconnect();
-    console.log('🔌 MongoDB Disconnected.');
+    console.log('MongoDB Disconnected.');
   }
 };
 

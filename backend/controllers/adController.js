@@ -1,10 +1,10 @@
 import Ad from '../models/Ad.js';
 import mongoose from 'mongoose';
 
-// REMOVED: path, fs, and BASE_URL are no longer needed here.
-
 export const postAd = async (req, res) => {
   try {
+    console.log("Incoming ad POST:", req.body);
+    console.log("Uploaded files:", req.files);
     const { title, description, price, location, category, user } = req.body;
 
     if (!title || !description || !price || !location || !category || !user) {
@@ -12,9 +12,8 @@ export const postAd = async (req, res) => {
     }
 
     let images = [];
-
-    // CHANGED: Get the secure URL directly from file.path provided by Cloudinary
     if (req.files && req.files.length > 0) {
+      // Cloudinary files have secure URLs
       images = req.files.map(file => file.path); 
     }
 
@@ -30,10 +29,9 @@ export const postAd = async (req, res) => {
 
     res.json({ success: true, ad: newAd });
   } catch (err) {
-  // This will print the full, detailed error message and stack trace
-  console.error("FULL POST ERROR:", err); 
-  res.status(500).json({ error: 'Error posting ad', details: err.message });
-}
+    console.error("FULL POST ERROR:", err);
+    res.status(500).json({ error: 'Error posting ad', details: err.message });
+  }
 };
 
 export const getAdById = async (req, res) => {
@@ -47,8 +45,7 @@ export const getAdById = async (req, res) => {
 
 export const getAllAds = async (req, res) => {
   try {
-    const ads = await Ad.find({ status: 'approved' })
-      .populate('user', 'name');
+    const ads = await Ad.find({ status: 'approved' }).populate('user', 'name');
     res.json(ads);
   } catch (err) {
     console.error(err);
@@ -79,12 +76,12 @@ export const updateAd = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, price, category, location, keepImages } = req.body;
+
     const keepArr = typeof keepImages === 'string' ? [keepImages] : (keepImages || []);
     const update = { title, description, price, category, location, images: [...keepArr] };
 
-    // CHANGED: Get the secure URL directly from file.path provided by Cloudinary
     if (req.files && req.files.length > 0) {
-      const newImageUrls = req.files.map(file => file.path);
+      const newImageUrls = req.files.map(file => file.path); // Cloudinary URLs
       update.images.push(...newImageUrls);
     }
 

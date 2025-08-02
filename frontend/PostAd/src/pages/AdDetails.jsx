@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import API from '../api/api'; // ✅ CHANGED: Import your central API instance
+import API from '../api/api'; 
 import Footer from '../components/Footer';
 import '../styles/AdDetails.css';
 import { AuthContext } from '../context/AuthContext';
@@ -22,7 +22,6 @@ const AdDetails = () => {
   useEffect(() => {
     const fetchAd = async () => {
       try {
-        // ✅ CHANGED: Use the API instance to call your live backend
         const res = await API.get(`/ads/${id}`);
         setAd(res.data);
       } catch (err) {
@@ -33,8 +32,6 @@ const AdDetails = () => {
   }, [id]);
 
   if (!ad) return <p>Loading...</p>;
-
-  // These functions are placeholders, you can connect them if needed
   const handleOpenLogin = () => {
     console.log("Login clicked");
   };
@@ -54,7 +51,7 @@ const AdDetails = () => {
                 {ad.images && ad.images.length > 0 && (
                   <>
                     <button className="arrow left" onClick={prevImage}>&#10094;</button>
-                    {/* ✅ CHANGED: Use the full Cloudinary URL directly */}
+                    {/* CHANGED: Use the full Cloudinary URL directly */}
                     <img
                       src={ad.images[currentImage]}
                       alt={`Ad ${currentImage}`}

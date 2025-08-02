@@ -5,7 +5,6 @@ export default function AdminAllAds() {
   const [ads, setAds] = useState([]);
 
   useEffect(() => {
-    // ✅ CHANGED: Use the API instance
     API.get("/admin/ads", {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
@@ -20,7 +19,6 @@ export default function AdminAllAds() {
   }, []);
 
   const updateStatus = (id, newStatus) =>
-    // ✅ CHANGED: Use the API instance
     API.put(
       `/admin/ads/${id}/status`,
       { status: newStatus },
@@ -30,7 +28,6 @@ export default function AdminAllAds() {
     );
 
   const deleteAd = (id) =>
-    // ✅ CHANGED: Use the API instance
     API.delete(`/ads/${id}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     }).then(() => setAds((prev) => prev.filter((ad) => ad._id !== id)));
@@ -45,7 +42,6 @@ export default function AdminAllAds() {
           {ads.map((ad) => (
             <div key={ad._id} className="ad-row">
               <div className="ad-card">
-                {/* ✅ CHANGED: Use the image URL directly and add a check */}
                 {ad.images && ad.images.length > 0 && (
                   <img src={ad.images[0]} alt={ad.title} />
                 )}

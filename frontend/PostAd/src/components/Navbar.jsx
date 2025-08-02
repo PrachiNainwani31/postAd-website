@@ -26,7 +26,6 @@ const Navbar = ({ onPostAdClick, openLogin, onSearch }) => {
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     if (storedToken && !user) {
-      // ✅ CHANGED: Use the environment variable for the API call
       fetch(`${import.meta.env.VITE_API_URL}/auth/validate`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       })

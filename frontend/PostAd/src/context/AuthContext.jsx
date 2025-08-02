@@ -23,7 +23,6 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     if (storedToken && !user) {
-      //  CHANGED: Use the environment variable for the API call
       fetch(`${import.meta.env.VITE_API_URL}/auth/validate`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       })
@@ -38,7 +37,6 @@ const AuthProvider = ({ children }) => {
         })
         .catch(() => logout());
     }
-  //  CHANGED: Dependency array to [] so this only runs once on app load
   }, []); 
 
   return (

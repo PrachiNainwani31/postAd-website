@@ -12,7 +12,7 @@
   text-align: center;
   display: flex;
   flex-direction: column;
-  padding: 0; /* <- REMOVE internal padding */
+  padding: 0;
 }
 
 .ad-card:hover {
@@ -23,7 +23,7 @@
   width: 100%;
   height: 180px;
   /* object-fit: cover; */
-  display: block; /* prevents extra space below inline images */
+  display: block; 
   /* border-radius: 0; */
   border-right: 0;
 }

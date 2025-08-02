@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import '../styles/PostAdPage.css';
 import { useNavigate } from 'react-router-dom';
-import API from '../api/api'; // ✅ CHANGED: Import your central API instance
+import API from '../api/api'; 
 import { AuthContext } from '../context/AuthContext';
 
 const PostAdPage = () => {
@@ -75,7 +75,6 @@ const PostAdPage = () => {
     data.append("user", fullUser._id);
 
     try {
-      // ✅ CHANGED: Use the API instance to post to the live backend
       const res = await API.post("/ads/post", data);
       if (res.data.success) {
         navigate("/");

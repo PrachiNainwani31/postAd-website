@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import '../styles/LoginPage.css';
 import API from '../api/api';
-// import axios from 'axios'; // 🛑 REMOVED: No longer needed
+// import axios from 'axios'; 
 import { AuthContext } from '../context/AuthContext';
 
 function LoginModal({ close, switchToRegister }) {
@@ -9,9 +9,7 @@ function LoginModal({ close, switchToRegister }) {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [showForgotLink, setShowForgotLink] = useState(false);
-
-  // Forgot password state
-  const [resetStep, setResetStep] = useState('idle'); // 'idle' | 'sent' | 'verify'
+  const [resetStep, setResetStep] = useState('idle'); 
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [resetMessage, setResetMessage] = useState('');
@@ -44,7 +42,6 @@ function LoginModal({ close, switchToRegister }) {
 
   const handleSendOtp = async () => {
     try {
-      // ✅ CHANGED: Use the API instance
       await API.post('/auth/forgot-password', { email: form.email });
       setResetMessage(`OTP sent to ${form.email}`);
       setResetStep('sent');
@@ -55,7 +52,6 @@ function LoginModal({ close, switchToRegister }) {
 
   const handleVerifyOtp = async () => {
     try {
-      // ✅ CHANGED: Use the API instance
       await API.post('/auth/reset-password', {
         email: form.email,
         otp,

@@ -1,4 +1,3 @@
-// cloudinary.js
 import cloudinary from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import dotenv from 'dotenv';
@@ -14,7 +13,7 @@ cloudinary.v2.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary.v2,
   params: {
-    folder: 'postad_uploads', // A folder name in your Cloudinary account
+    folder: 'postad_uploads',
     allowed_formats: ['jpeg', 'png', 'jpg'],
   },
 });

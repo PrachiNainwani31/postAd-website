@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import API from '../api/api'; // ✅ CHANGED: Import your central API instance
-// import axios from 'axios'; // 🛑 REMOVED: No longer need direct axios
+import API from '../api/api'; 
+// import axios from 'axios'; 
 
 function AdminUserAds() {
   const { id } = useParams();
@@ -9,7 +9,6 @@ function AdminUserAds() {
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    // ✅ CHANGED: Use the API instance
     API.get(`/admin/users/${id}/ads`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -23,7 +22,6 @@ function AdminUserAds() {
   }, [id]);
 
   const updateStatus = (adId, status) => {
-    // CHANGED: Use the API instance
     API.put(`/admin/ads/${adId}/status`, { status }, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -34,7 +32,6 @@ function AdminUserAds() {
   };
 
   const deleteAd = (adId) => {
-    //  CHANGED: Use the API instance
     API.delete(`/ads/${adId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,

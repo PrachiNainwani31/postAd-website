@@ -6,20 +6,17 @@ import { isAdmin } from '../middleware/adminMiddleware.js';
 
 const router = express.Router();
 
-//Get all users
 router.get('/users', authenticate, isAdmin, async (req, res) => {
   const users = await User.find({}, 'name email role');
   res.json(users);
 });
 
-// Delete a user
 router.delete('/users/:id', authenticate, isAdmin, async (req, res) => {
   await User.findByIdAndDelete(req.params.id);
-  await Ad.deleteMany({ userId: req.params.id }); // clean up user's ads
+  await Ad.deleteMany({ userId: req.params.id }); 
   res.json({ success: true });
 });
 
-// Get ads of a user
 router.get('/users/:id/ads', authenticate, isAdmin, async (req, res) => {
   try {
     const ads = await Ad.find({ user: req.params.id });
@@ -35,8 +32,6 @@ router.get('/users/:id/ads', authenticate, isAdmin, async (req, res) => {
   }
 });
 
-
-//Update status of ad
 router.put('/ads/:id/status', authenticate, isAdmin, async (req, res) => {
   const { status } = req.body;
   const ad = await Ad.findByIdAndUpdate(req.params.id, { status }, { new: true });
@@ -64,7 +59,6 @@ router.put('/ads/:id/status', authenticate, isAdmin, async (req, res) => {
   }
 });
 
-// GET all ads for admin sorted by status priority
 router.get('/ads', authenticate, isAdmin, async (req, res) => {
   const allAds = await Ad.find().populate('user', 'name email');
   const order = { pending: 0, approved: 1, rejected: 2 };

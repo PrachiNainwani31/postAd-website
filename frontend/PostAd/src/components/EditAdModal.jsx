@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import API from '../api/api'; // CHANGED: Import your central API instance
+import API from '../api/api';
 import '../styles/EditAdModal.css';
 
 const categories = ["Services", "Business Promotion", "Sales", "Jobs"];

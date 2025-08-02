@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import API from '../api/api'; // ✅ CHANGED: Import your central API instance
+import API from '../api/api'; 
 import { AuthContext } from '../context/AuthContext';
 import EditAdModal from '../components/EditAdModal';
 import Footer from '../components/Footer';
@@ -12,7 +12,6 @@ const MyAds = () => {
 
   useEffect(() => {
     if (user?._id) {
-      // ✅ CHANGED: Use the API instance
       API.get(`/ads/user/${user._id}`)
         .then(res => setAds(res.data))
         .catch(err => console.error("Error fetching user ads:", err));
@@ -21,7 +20,6 @@ const MyAds = () => {
 
   const handleDelete = async (adId) => {
     try {
-      // ✅ CHANGED: Use the API instance
       await API.delete(`/ads/${adId}`);
       setAds(prev => prev.filter(ad => ad._id !== adId));
     } catch (err) {

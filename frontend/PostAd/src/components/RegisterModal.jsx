@@ -21,13 +21,13 @@ function RegisterModal({ close, switchToLogin}) {
 
   const handleRegister = async (e) => {
   e.preventDefault();
-  console.log("Register form data:", form); // 👈 log it
+  console.log("Register form data:", form); 
   try {
     const res = await API.post("/auth/register", form);
     setSuccess("OTP sent to your email");
     setOtpSent(true);
   } catch (err) {
-    console.error("Register Error:", err.response?.data); // log backend error
+    console.error("Register Error:", err.response?.data); 
     setError(err.response?.data?.message || "Registration failed");
   }
 };
@@ -48,7 +48,7 @@ function RegisterModal({ close, switchToLogin}) {
     const { token, user } = loginRes.data;
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
-    login(user, token); //  fixed here
+    login(user, token);
 
     setSuccess("Registration successful");
     close();

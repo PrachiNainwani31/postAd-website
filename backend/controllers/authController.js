@@ -4,16 +4,12 @@ const bcrypt = require('bcryptjs');
 const sendEmailOTP = require('../utils/sendEmailOTP');
 const jwt = require('jsonwebtoken');
 
-// Generate JWT
 const generateToken = (userId) => jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-// Generate 6-digit OTP
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
-// Email format validation
 const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-// ✅ Validate token
 exports.validateToken = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
@@ -31,7 +27,6 @@ exports.validateToken = async (req, res) => {
   }
 };
 
-// ✅ Register (OTP step)
 exports.register = async (req, res) => {
   const { name, email, password } = req.body;
   if (!email || !password || !name) return res.status(400).json({ message: 'All fields are required' });
@@ -66,7 +61,6 @@ exports.register = async (req, res) => {
   }
 };
 
-// ✅ Verify OTP and create account
 exports.verifyOtp = async (req, res) => {
   const { contact, otp } = req.body;
 
@@ -98,7 +92,6 @@ exports.verifyOtp = async (req, res) => {
   }
 };
 
-// ✅ Login
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -106,7 +99,6 @@ exports.login = async (req, res) => {
     if (!user) return res.status(400).json({ message: 'User not found' });
     if (!user.isVerified) return res.status(403).json({ message: 'Please verify OTP first' });
 
-    // Assign admin
     if (email === 'prachinainwnai31@gmail.com' && user.role !== 'admin') {
       user.role = 'admin';
       await user.save();
@@ -132,7 +124,6 @@ exports.login = async (req, res) => {
   }
 };
 
-//  Forgot Password (Send OTP)
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
   if (!validateEmail(email)) return res.status(400).json({ message: 'Invalid email format' });
@@ -154,7 +145,6 @@ exports.forgotPassword = async (req, res) => {
   res.json({ message: 'OTP sent to email' });
 };
 
-// ✅ Reset Password
 exports.resetPassword = async (req, res) => {
   const { email, otp, newPassword } = req.body;
   if (!email || !otp || !newPassword)
